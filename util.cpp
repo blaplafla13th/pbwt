@@ -16,7 +16,7 @@ void parallel_run(int argc, char *argv[]) {
     printf("Read file: %s\n", f.c_str());
     vector<vector<int> > X = read_hap(f);
 
-    const int retry = 10;
+    const int retry = 20;
     const int L = 4;
     printf("Test size: %lu haps x %lu sites\n", X.size(), X[0].size());
     printf("Retry: %d\n", retry);
@@ -46,7 +46,7 @@ void single_run(int argc, char *argv[]) {
     printf("Read file: %s\n", f.c_str());
     vector<vector<int> > X = read_hap(f);
 
-    const int retry = 10;
+    const int retry = 20;
     const int L = 4;
     printf("Test size: %lu haps x %lu sites\n", X.size(), X[0].size());
     printf("Retry: %d\n", retry);
