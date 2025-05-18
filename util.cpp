@@ -16,7 +16,7 @@ void parallel_run(int argc, char *argv[]) {
     printf("Read file: %s\n", f.c_str());
     vector<vector<int> > X = read_hap(f);
 
-    const int retry = 1;
+    const int retry = 10;
     const int L = 4;
     printf("Test size: %lu haps x %lu sites\n", X.size(), X[0].size());
     printf("Retry: %d\n", retry);
@@ -35,8 +35,8 @@ void parallel_run(int argc, char *argv[]) {
             matches = build_and_match(X, i, L);
             stop = high_resolution_clock::now();
             duration_total_run += duration_cast<microseconds>(stop - start).count();
-            // print_matches(matches);
         }
+        // print_matches(matches);
         printf("Time: %ld us\n\n", duration_total_run / retry);
     }
 }
@@ -46,11 +46,14 @@ void single_run(int argc, char *argv[]) {
     printf("Read file: %s\n", f.c_str());
     vector<vector<int> > X = read_hap(f);
 
-    const int retry = 1;
+    const int retry = 10;
     const int L = 4;
     printf("Test size: %lu haps x %lu sites\n", X.size(), X[0].size());
     printf("Retry: %d\n", retry);
     printf("Matched length: %d\n", L);
+    int nthreads = static_cast<int>(thread::hardware_concurrency());
+    printf("Max thread:%d\n\n", nthreads);
+
     printf("Num thread:%d\n", 1);
     signed long int duration_total_run = 0;
     high_resolution_clock::time_point start, stop;
@@ -61,37 +64,23 @@ void single_run(int argc, char *argv[]) {
         matches = build_and_match(X, 1, 4);
         stop = high_resolution_clock::now();
         duration_total_run += duration_cast<microseconds>(stop - start).count();
-        // print_matches(matches);
     }
+    // print_matches(matches);
     printf("Time: %ld us\n\n", duration_total_run / retry);
 }
 
 void print_matches(const vector<vector<int> > &all_matches_report)
 {
-    // First, find unique combinations of columns 2 and 3 with max length
-    map<pair<int, int>, vector<int>> best_matches;
-    for (const auto &match : all_matches_report) {
-        pair<int, int> key = {match[1], match[2]};
-        if (best_matches.find(key) == best_matches.end() ||
-            best_matches[key][3] < match[3]) {
-            best_matches[key] = match;
-            }
-    }
-
-    // Convert map back to vector
-    vector<vector<int>> filtered_matches;
-    for (const auto &pair : best_matches) {
-        filtered_matches.push_back(pair.second);
-    }
+   vector<vector<int> > sorted =(all_matches_report);
 
     // Sort the filtered matches by column 1 (position)
-    sort(filtered_matches.begin(), filtered_matches.end(),
+    sort(sorted.begin(), sorted.end(),
          [](const vector<int>& a, const vector<int>& b) {
              return a[0] == b[0] ? a[1] == b[1] ? a[2] < b[2] : a[1] < b[1] : a[0] < b[0];
          });
 
     // Print the sorted matches
-    for (const auto &match: filtered_matches) {
+    for (const auto &match: sorted) {
         printf("Position %d: [%d, %d], length=%d\n",
                match[0], match[1]+1, match[2]+1, match[3]);
     }
