@@ -26,7 +26,7 @@ void parallel_run(int argc, char *argv[]) {
     printf("Max thread:%d\n\n", nthreads);
     for (int i = 2; i <= nthreads; ++i) {
         printf("Num thread:%d\n", i);
-        signed long int duration_total_run = 0;
+        vector<long long> duration_total_run(retry);
         high_resolution_clock::time_point start, stop;
         vector<vector<int> > matches;
         vector<vector<vector<int> > > res;
@@ -34,10 +34,10 @@ void parallel_run(int argc, char *argv[]) {
             start = high_resolution_clock::now();
             matches = build_and_match(X, i, L);
             stop = high_resolution_clock::now();
-            duration_total_run += duration_cast<microseconds>(stop - start).count();
+            duration_total_run.push_back(duration_cast<microseconds>(stop - start).count());
         }
         // print_matches(matches);
-        printf("Time: %ld us\n\n", duration_total_run / retry);
+        printf("Time: %ld us\n\n", duration_total_run[retry/2]);
     }
 }
 
@@ -55,7 +55,7 @@ void single_run(int argc, char *argv[]) {
     printf("Max thread:%d\n\n", nthreads);
 
     printf("Num thread:%d\n", 1);
-    signed long int duration_total_run = 0;
+    vector<long long> duration_total_run(1);
     high_resolution_clock::time_point start, stop;
     vector<vector<int> > matches;
     vector<vector<vector<int> > > res;
@@ -63,10 +63,10 @@ void single_run(int argc, char *argv[]) {
         start = high_resolution_clock::now();
         matches = build_and_match(X, 1, 4);
         stop = high_resolution_clock::now();
-        duration_total_run += duration_cast<microseconds>(stop - start).count();
+        duration_total_run.push_back(duration_cast<microseconds>(stop - start).count());
     }
     // print_matches(matches);
-    printf("Time: %ld us\n\n", duration_total_run / retry);
+    printf("Time: %ld us\n\n", duration_total_run[retry/2]);
 }
 
 void print_matches(const vector<vector<int> > &all_matches_report)
